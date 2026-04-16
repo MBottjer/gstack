@@ -745,6 +745,10 @@ const idleCheckInterval = setInterval(() => {
 const BROWSE_PARENT_PID = parseInt(process.env.BROWSE_PARENT_PID || '0', 10);
 if (BROWSE_PARENT_PID > 0) {
   setInterval(() => {
+    // Headed mode is a user-visible browsing session. It should outlive the
+    // short-lived `browse connect` CLI and only stop when the user closes or
+    // explicitly disconnects it.
+    if (browserManager.getConnectionMode() === 'headed') return;
     try {
       process.kill(BROWSE_PARENT_PID, 0); // signal 0 = existence check only, no signal sent
     } catch {

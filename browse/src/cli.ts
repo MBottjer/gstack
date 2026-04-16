@@ -841,12 +841,11 @@ Refs:           After 'snapshot', use @e1, @e2... as selectors:
         BROWSE_HEADED: '1',
         BROWSE_PORT: '34567',
         BROWSE_SIDEBAR_CHAT: '1',
+        // Headed mode is an intentionally persistent browser session, not a
+        // short-lived helper. Disable parent-PID watchdog so the server does
+        // not kill the visible browser as soon as this `connect` CLI exits.
+        BROWSE_PARENT_PID: '0',
       };
-      // If parent explicitly set BROWSE_PARENT_PID=0 (pair-agent disabling
-      // self-termination), pass it through so startServer doesn't override it.
-      if (process.env.BROWSE_PARENT_PID === '0') {
-        serverEnv.BROWSE_PARENT_PID = '0';
-      }
       const newState = await startServer(serverEnv);
 
       // Print connected status

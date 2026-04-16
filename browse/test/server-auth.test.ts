@@ -304,10 +304,19 @@ describe('Server auth security', () => {
     // The connect subprocess env must override BROWSE_PARENT_PID
     expect(pairBlock).toContain("BROWSE_PARENT_PID");
     expect(pairBlock).toContain("'0'");
-    // The connect command must propagate BROWSE_PARENT_PID=0 to serverEnv
+    // The connect command must disable parent monitoring for headed mode too
     const connectBlock = sliceBetween(CLI_SRC, 'Launching headed Chromium', 'Sidebar agent started');
-    expect(connectBlock).toContain("BROWSE_PARENT_PID");
-    expect(connectBlock).toContain("serverEnv.BROWSE_PARENT_PID");
+    expect(connectBlock).toContain("BROWSE_PARENT_PID: '0'");
+  });
+
+  test('connect disables parent PID monitoring for headed mode', () => {
+    const connectBlock = sliceBetween(CLI_SRC, 'Launching headed Chromium', 'Sidebar agent started');
+    expect(connectBlock).toContain("BROWSE_PARENT_PID: '0'");
+  });
+
+  test('parent watchdog skips headed mode', () => {
+    const watchdogBlock = sliceBetween(SERVER_SRC, 'Parent-Process Watchdog', 'Command Sets');
+    expect(watchdogBlock).toContain("getConnectionMode() === 'headed'");
   });
 
   // Regression: newtab returned 403 for scoped tokens because the tab ownership
